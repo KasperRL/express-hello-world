@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy
+
+build-code-job:
+  stage: build
+  image: node:18-buster
+  script:
+    - echo 'Building application...'
+    - echo 'Application build!'
+
+deploy-code-job:
+  stage: deploy
+  image: node:18-buster
+  variables:
+    GITHUB_URL: git@github.com:KasperRL/express-hello-world.git
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - eval `ssh-agent -s`
+    - ssh-add <(echo "$PRIVATE_SSH_KEY")
+    - mkdir -p ~/.ssh
+    - ssh-keyscan -t rsa gitlab.com >> ~/.ssh/known_hosts
+    - ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+  script:
+    - git checkout main
+    - git merge feature
+    - git remote add github (echo $GITHUB_URL)
+    - git push github main
