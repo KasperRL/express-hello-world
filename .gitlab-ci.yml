@@ -24,5 +24,5 @@ deploy-code-job:
   script:
     - git checkout -B main
     - git merge origin/feature
-    - git remote add github (echo $GITHUB_URL)
+    - git remote add github (echo "$GITHUB_URL")
     - git push github main
